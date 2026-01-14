@@ -1,38 +1,20 @@
 # covid-scfv-publication
 
-
-
 ## Table of Contents
 - [Purpose](#purpose)
-- [Tools](#tools)
-- [Requirements](#requirements)
-- [Licensing](#licensing)
-- [Help](#help)
 - [Scope](#scope)
+- [Requirements](#requirements)
+- [Tools](#tools)
 - [Reproducing this analysis](#reproducing-this-analysis)
+- [Citing this Work](#citing-this-work)
+- [Help](#help)
+- [Licensing](#licensing)
 - [Analysis](#analysis)
   - [Steps](#steps)
-
 
 ## Purpose
 
 This repository contains instructions for reproducing the work from an upcoming research manuscript. This study describes the characterization of scFv antibody fragments selected through phage display against viral and control epitopes.
-
-## Tools
-
-The first step of the analysis -- scFv extraction from sequencing files -- is based on [Seq2scfv](https://github.com/ngs-ai-org/seq2scfv), published by [Salvy et al. (2024)](https://www.tandfonline.com/doi/full/10.1080/19420862.2024.2408344). This toolkit, to function, required fixes and upgrades which I maintain in [my seq2scfv fork](https://github.com/MikolajKocikowski/seq2scfv-unofficial-updated). This repository was the source for building the Docker image that we will use below. We appear to be the first group to adapt this tool.
-
-### Requirements
-
-The script can be very RAM-intensive - see [step 3](#3-vdj-alignment) to estimate your requirements! If the input dataset is large (more than a few samples), using an HPC or a powerful remote VM is recommended. Some academic HPCs restrict `Docker` usage due to security concerns but `Docker` is required here. In theory a Docker image can be converted for use with Apptainer - if you can make it work, I'd love to talk.
-
-## Licensing
-
-While this repository is released under the MIT License, a part of this analysis relies on modified [Seq2scfv](https://github.com/ngs-ai-org/seq2scfv) software, which is published under a **Limited License**, restricting its use to **non-profit research purposes**. Users are responsible for complying with the terms of that license.
-
-## Help
-
-Please reach out with any problems running the pipeline - I will try to help and am happy for constructive feedback! For complete descriptions of each step please consult materials above, while keeping in mind the code and instructions presented here are not identical to the original `Seq2scfv`
 
 ## Scope
 
@@ -43,6 +25,14 @@ The repository currently contains:
 What will be progressively added:
 - extensive data analysis in `R` 
 - pipeline automation with Snakemake/Nextflow (for now please run manually and check output)
+
+### Requirements
+
+The script can be very RAM-intensive - see [step 3](#3-vdj-alignment) to estimate your requirements! If the input dataset is large (more than a few samples), using an HPC or a powerful remote VM is recommended. Some academic HPCs restrict `Docker` usage due to security concerns but `Docker` is required here. In theory a Docker image can be converted for use with Apptainer - if you can make it work, I'd love to talk.
+
+## Tools
+
+The first step of the analysis -- scFv extraction from sequencing files -- is based on [Seq2scfv](https://github.com/ngs-ai-org/seq2scfv), published by [Salvy et al. (2024)](https://www.tandfonline.com/doi/full/10.1080/19420862.2024.2408344). This toolkit, to function, required fixes and upgrades which I maintain in [my seq2scfv fork](https://github.com/MikolajKocikowski/seq2scfv-unofficial-updated). This repository was the source for building the Docker image that we will use below. We appear to be the first group to adapt this tool.
 
 ## Reproducing this analysis
 
@@ -65,6 +55,23 @@ endpoint = ams3.digitaloceanspaces.com
 ACL = private
 
 ```
+The analysis was run on Ubuntu 24.04 (LTS) x64.
+
+## Citing this Work
+
+If you use this code, scripts, or data in your research, we’d love to hear from you! Please also cite this work. Once the manuscript is out, we will provide a DOI. For now, you can cite it as:  
+
+> M. Kocikowski, *covid-scfv-publication* (GitHub repository), 2026. Available at: https://github.com/MikolajKocikowski/covid-scfv-publication
+
+We welcome feedback, suggestions, or contributions — feel free to open an issue or pull request!
+
+## Help
+
+Please reach out with any problems running the pipeline - I will try to help and am happy for constructive feedback! For complete descriptions of each step please consult materials above, while keeping in mind the code and instructions presented here are not identical to the original `Seq2scfv`
+
+## Licensing
+
+While this repository is released under the MIT License, a part of this analysis relies on modified [Seq2scfv](https://github.com/ngs-ai-org/seq2scfv) software, which is published under a **Limited License**, restricting its use to **non-profit research purposes**. Users are responsible for complying with the terms of that license.
 
 # Analysis
 
