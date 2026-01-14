@@ -42,6 +42,7 @@ The repository currently contains:
 
 What will be progressively added:
 - extensive data analysis in `R` 
+- pipeline automation with Snakemake/Nextflow (for now please run manually and check output)
 
 ## Reproducing this analysis
 
@@ -49,7 +50,7 @@ To reproduce the exact analysis form this study, download the raw data from:
 - planned: Zenodo (pending approval of coauthors) 
 - currently: DigitalOcean (`DO`) S3 bucket (contact me for access keys)
 
-You might choose to download from `DO` with `Rclone` (elaborated below). Config parameters are:
+You might choose to download from `DO` with `Rclone` (elaborated later below), with this configuration:
 
 ```ini
 name: "stage"
