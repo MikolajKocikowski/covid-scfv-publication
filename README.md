@@ -20,25 +20,25 @@ This repository contains instructions for reproducing the work from an upcoming 
 
 The repository currently contains:
 - code and instructions for scFv extraction
-- custom species reference files for IgBlast (description in progress [future link]())
+- custom species reference files for IgBlast (description in progress: [future link]())
 
 What will be progressively added:
 - extensive data analysis in `R` 
-- pipeline automation with Snakemake/Nextflow (for now please run manually and check output)
+- pipeline automation with Snakemake/Nextflow (for now please run manually and verify output)
 
-### Requirements
+## Requirements
 
 The script can be very RAM-intensive - see [step 3](#3-vdj-alignment) to estimate your requirements! If the input dataset is large (more than a few samples), using an HPC or a powerful remote VM is recommended. Some academic HPCs restrict `Docker` usage due to security concerns but `Docker` is required here. In theory a Docker image can be converted for use with Apptainer - if you can make it work, I'd love to talk.
 
 ## Tools
 
-The first step of the analysis -- scFv extraction from sequencing files -- is based on [Seq2scfv](https://github.com/ngs-ai-org/seq2scfv), published by [Salvy et al. (2024)](https://www.tandfonline.com/doi/full/10.1080/19420862.2024.2408344). This toolkit, to function, required fixes and upgrades which I maintain in [my seq2scfv fork](https://github.com/MikolajKocikowski/seq2scfv-unofficial-updated). This repository was the source for building the Docker image that we will use below. We appear to be the first group to adapt this tool.
+The first step of the analysis -- scFv extraction from sequencing files -- is based on [Seq2scfv](https://github.com/ngs-ai-org/seq2scfv), published by [Salvy et al. (2024)](https://www.tandfonline.com/doi/full/10.1080/19420862.2024.2408344). This toolkit required fixes and upgrades which I maintain in [my seq2scfv fork](https://github.com/MikolajKocikowski/seq2scfv-unofficial-updated). This repository was the source for building the Docker image that we will use below.
 
 ## Reproducing this analysis
 
 To reproduce the exact analysis form this study, download the raw data from:
 - planned: Zenodo (pending approval of coauthors) 
-- currently: DigitalOcean (`DO`) S3 bucket (contact me for access keys)
+- currently: DigitalOcean S3 bucket (contact me for access keys)
 
 You might choose to download from `DO` with `Rclone` (elaborated later below), with this configuration:
 
@@ -67,11 +67,11 @@ We welcome feedback, suggestions, or contributions — feel free to open an issu
 
 ## Help
 
-Please reach out with any problems running the pipeline - I will try to help and am happy for constructive feedback! For complete descriptions of each step please consult materials above, while keeping in mind the code and instructions presented here are not identical to the original `Seq2scfv`
+Please reach out with any problems running the pipeline -- I will try to help. I'm also happy to gather constructive feedback. For complete descriptions of each step please consult materials linked above, while keeping in mind the code and instructions presented here are not identical to those from original `Seq2scfv`
 
 ## Licensing
 
-While this repository is released under the MIT License, a part of this analysis relies on modified [Seq2scfv](https://github.com/ngs-ai-org/seq2scfv) software, which is published under a **Limited License**, restricting its use to **non-profit research purposes**. Users are responsible for complying with the terms of that license.
+While this repository is released under the MIT License, a part of the analysis relies on [Seq2scfv](https://github.com/ngs-ai-org/seq2scfv) toolkit, published under a **limited license**, which restricts its use to **non-profit research purposes**. Users are responsible for complying with the terms of that license.
 
 # Analysis
 
