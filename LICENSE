@@ -1,3 +1,9 @@
+# Note
+
+While this repository is released under the license below, a part of the described analysis relies on Seq2scfv software, which is published under a limited license, restricting its use to non-profit research purposes. Users are responsible for complying with the terms of that license. Details are available in README.md.
+
+# License for this repository
+
 MIT License
 
 Copyright (c) 2026 Mikolaj Kocikowski, PhD
