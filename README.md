@@ -25,6 +25,7 @@ The repository currently contains:
 What will be progressively added:
 - extensive data analysis in `R` 
 - pipeline automation with Snakemake/Nextflow (for now please run manually and verify output)
+- small refinements and updates to the Python syntax
 
 ## Requirements
 
