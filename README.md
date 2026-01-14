@@ -30,7 +30,7 @@ Please reach out with any problems running the pipeline - I will try to help and
 
 The repository currently contains:
 - instructions for scFv extraction
-- custom species reference files for IgBlast (description in progress [future link])
+- custom species reference files for IgBlast (description in progress [future link]())
 
 What will be progressively added:
 - extensive data analysis in `R` 
