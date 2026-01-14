@@ -7,8 +7,8 @@
 - [Tools](#tools)
 - [Reproducing this analysis](#reproducing-this-analysis)
 - [Citing this Work](#citing-this-work)
-- [Help](#help)
 - [Licensing](#licensing)
+- [Help](#help)
 - [Analysis](#analysis)
   - [Steps](#steps)
 
@@ -28,7 +28,7 @@ What will be progressively added:
 
 ## Requirements
 
-The script can be very RAM-intensive - see [step 3](#3-vdj-alignment) to estimate your requirements! If the input dataset is large (more than a few samples), using an HPC or a powerful remote VM is recommended. Some academic HPCs restrict `Docker` usage due to security concerns but `Docker` is required here. In theory a Docker image can be converted for use with Apptainer - if you can make it work, I'd love to talk.
+The script can be very RAM-intensive - see [step 3](#3-vdj-alignment) to estimate your requirements! If the input dataset is large (more than a few samples), using an HPC or a powerful remote VM is recommended. Note that Docker is required, but it is not allowed on some HPC systems due to security restrictions. In theory a `Docker image` can be converted for use with `Apptainer` - if you can make it work, I'd love to talk.
 
 ## Tools
 
@@ -57,6 +57,14 @@ ACL = private
 ```
 The analysis was run on Ubuntu 24.04 (LTS) x64.
 
+## Help
+
+Please reach out with any problems running the pipeline -- I will try to help. I'm also happy to gather constructive feedback. For complete descriptions of each step please consult materials linked above, while keeping in mind the code and instructions presented here are not identical to those from original `Seq2scfv`
+
+## Licensing
+
+While this repository is released under the MIT License, a part of the analysis relies on [Seq2scfv](https://github.com/ngs-ai-org/seq2scfv) toolkit, published under a **limited license**, which allows **non-profit research use only**. Users are responsible for complying with the terms of that license.
+
 ## Citing this Work
 
 If you use this code, scripts, or data in your research, we’d love to hear from you! Please also cite this work. Once the manuscript is out, we will provide a DOI. For now, you can cite it as:  
@@ -64,14 +72,6 @@ If you use this code, scripts, or data in your research, we’d love to hear fro
 > M. Kocikowski, *covid-scfv-publication* (GitHub repository), 2026. Available at: https://github.com/MikolajKocikowski/covid-scfv-publication
 
 We welcome feedback, suggestions, or contributions — feel free to open an issue or pull request!
-
-## Help
-
-Please reach out with any problems running the pipeline -- I will try to help. I'm also happy to gather constructive feedback. For complete descriptions of each step please consult materials linked above, while keeping in mind the code and instructions presented here are not identical to those from original `Seq2scfv`
-
-## Licensing
-
-While this repository is released under the MIT License, a part of the analysis relies on [Seq2scfv](https://github.com/ngs-ai-org/seq2scfv) toolkit, published under a **limited license**, which restricts its use to **non-profit research purposes**. Users are responsible for complying with the terms of that license.
 
 # Analysis
 
