@@ -1,11 +1,15 @@
 # covid-scfv-publication
 
+
+
 ## Table of Contents
 - [Purpose](#purpose)
-- [Dependencies](#dependencies)
+- [Tools](#tools)
+- [Requirements](#requirements)
 - [Licensing](#licensing)
 - [Help](#help)
 - [Scope](#scope)
+- [Reproducing this analysis](#reproducing-this-analysis)
 - [Analysis](#analysis)
   - [Steps](#steps)
 
@@ -14,9 +18,13 @@
 
 This repository contains instructions for reproducing the work from an upcoming research manuscript. This study describes the characterization of scFv antibody fragments selected through phage display against viral and control epitopes.
 
-## Dependencies
+## Tools
 
-The first step of the analysis -- scFv extraction from sequencing files -- is based on [Seq2scfv](https://github.com/ngs-ai-org/seq2scfv), published by [Salvy et al. (2024)](https://www.tandfonline.com/doi/full/10.1080/19420862.2024.2408344). This toolkit, to function, required fixes and upgrades which I maintain in [my seq2scfv fork](https://github.com/MikolajKocikowski/seq2scfv-unofficial-updated). This repository was the source for building the Docker image that we will use below.
+The first step of the analysis -- scFv extraction from sequencing files -- is based on [Seq2scfv](https://github.com/ngs-ai-org/seq2scfv), published by [Salvy et al. (2024)](https://www.tandfonline.com/doi/full/10.1080/19420862.2024.2408344). This toolkit, to function, required fixes and upgrades which I maintain in [my seq2scfv fork](https://github.com/MikolajKocikowski/seq2scfv-unofficial-updated). This repository was the source for building the Docker image that we will use below. We appear to be the first group to adapt this tool.
+
+### Requirements
+
+The script can be very RAM-intensive - see [step 3](#3-vdj-alignment) to estimate your requirements! If the input dataset is large (more than a few samples), using an HPC or a powerful remote VM is recommended. Some academic HPCs restrict `Docker` usage due to security concerns but `Docker` is required here. In theory a Docker image can be converted for use with Apptainer - if you can make it work, I'd love to talk.
 
 ## Licensing
 
@@ -29,11 +37,33 @@ Please reach out with any problems running the pipeline - I will try to help and
 ## Scope
 
 The repository currently contains:
-- instructions for scFv extraction
+- code and instructions for scFv extraction
 - custom species reference files for IgBlast (description in progress [future link]())
 
 What will be progressively added:
 - extensive data analysis in `R` 
+
+## Reproducing this analysis
+
+To reproduce the exact analysis form this study, download the raw data from:
+- planned: Zenodo (pending approval of coauthors) 
+- currently: DigitalOcean (`DO`) S3 bucket (contact me for access keys)
+
+You might choose to download from `DO` with `Rclone` (elaborated below). Config parameters are:
+
+```bash
+name: "stage"
+bucket: "data-stage"
+
+type = s3
+provider = DigitalOcean
+access_key_id = <readonly-key> # contact me
+secret_access_key = <readonly-secret> # contact me
+region = ams3
+endpoint = ams3.digitaloceanspaces.com
+ACL = private
+
+```
 
 # Analysis
 
