@@ -51,7 +51,7 @@ To reproduce the exact analysis form this study, download the raw data from:
 
 You might choose to download from `DO` with `Rclone` (elaborated below). Config parameters are:
 
-```bash
+```ini
 name: "stage"
 bucket: "data-stage"
 
