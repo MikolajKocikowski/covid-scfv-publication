@@ -382,9 +382,8 @@ If you inspect the output and for a given scFv there are 0 counts across all sam
 
 The resultant table summarizes sequence counts at each major step of the pipeline, showing attrition from raw reads to fully validated scFvs.
 
-Create a script by running `nano attrition_table.sh`.
-Paste the code below.
-Deploy: `bash attrition_table.sh > attrition_table.tsv`
+Run this from outside container (`exit` if needed). Create a script by running `nano attrition_table.sh`.
+Paste the code privided below. Deploy: `bash attrition_table.sh > attrition_table.tsv`. Print the results nicely formated: `cat attrition_table.tsv | column -t -s $'\t'`.
 
 ```bash
 #!/bin/bash
@@ -426,12 +425,6 @@ for label in "${labels[@]}"; do
     echo -e "${label}\t${count}"
 done
 ```
-
-Print it nicely formated:
-```bash
-cat attrition_table.tsv | column -t -s $'\t'
-```
-
 Example output
 ```
 Category                  Count
@@ -444,7 +437,7 @@ Non-standard AAs          0
 Validated scFvs           3641
 ```
 
-The following categories are discarded: 
+The sequences from following categories are not included in the final results file: 
 - `Non-paired / multi VH/VL` -- unpaired sequences, or sequences with more than 1 VH or VL
 - `Out-of-frame scFvs` -- sequences with stop codons in the scFv, or incongruent frames between VH and VL
 - `Non-standard AAs` -- paired VH-VL sequences presenting non-standard aminoacids
