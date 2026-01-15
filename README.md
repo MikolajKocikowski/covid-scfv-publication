@@ -362,7 +362,7 @@ mv in_frame_igBLAST_paired_delim_linker_scored_flags.tsv /analysis/6.Flags/
 
 ### 7. Recovering per-library read counts
 
-```bash
+```shell
 # recover counts
 scFv="/analysis/6.Flags/in_frame_igBLAST_paired_delim_linker_scored_flags.tsv"
 corr="/analysis/2.Catalogued/merged.nt_correspondence.tsv"
