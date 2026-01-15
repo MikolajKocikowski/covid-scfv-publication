@@ -27,7 +27,7 @@
       - [Linker overview](#linker-overview---inspect-visually)
     - [6. scFv flags](#6-scfv-flags)
     - [7. Per-library read counts](#7-recovering-per-library-read-counts)
-    - [8. Generate an attrition table](#generate-an-attrition-table)
+    - [8. Generate an attrition table](#8-generate-an-attrition-table)
   - [Post-processing](#post-processing)
 
 
