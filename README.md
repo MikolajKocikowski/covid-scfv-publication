@@ -382,8 +382,21 @@ If you inspect the output and for a given scFv there are 0 counts across all sam
 
 The resultant table summarizes sequence counts at each major step of the pipeline, showing attrition from raw reads to fully validated scFvs.
 
-Run this from outside container (`exit` if needed). Create a script by running `nano attrition_table.sh`.
-Paste the code privided below. Deploy: `bash attrition_table.sh > attrition_table.tsv`. Print the results nicely formated: `cat attrition_table.tsv | column -t -s $'\t'`.
+```bash
+# Run this from outside the container - quit it if needed
+exit
+
+# Create a script by running 
+nano attrition_table.sh
+
+# Paste the code privided in the next chunk, then deploy: 
+bash attrition_table.sh > attrition_table.tsv
+
+# Print the results, nicely formated: 
+cat attrition_table.tsv | column -t -s $'\t'
+```
+
+Script contents:
 
 ```bash
 #!/bin/bash
