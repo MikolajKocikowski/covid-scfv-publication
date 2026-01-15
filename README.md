@@ -27,7 +27,7 @@
       - [Linker overview](#linker-overview---inspect-visually)
     - [6. scFv flags](#6-scfv-flags)
     - [7. Per-library read counts](#7-recovering-per-library-read-counts)
-    - [8. Post-processing](#8-post-processing)
+  - [Post-processing](#post-processing)
 
 
 ## Purpose
@@ -46,11 +46,11 @@ What will be progressively added:
 
 ## Requirements
 
-The script can be very RAM-intensive - see [step 3](#3-vdj-alignment) to estimate your requirements! If the input dataset is large (more than a few samples), using an HPC or a powerful remote VM is recommended. 
+The analysis can be very RAM-intensive - see [step 3](#3-vdj-alignment) to estimate your requirements! If the input dataset is large (more than a few samples), using an HPC or a powerful remote VM is recommended. 
 
 Docker is required, but it is not allowed on some HPC systems due to security restrictions. In theory a `Docker image` can be converted for use with `Apptainer` - if you can make it work, I'd love to talk.
 
-This script assumes high-quality, pre-processed FASTQ files from long-read sequencing are provided - see [step 1](#1-data-preprocessing---from-fastq-to-fasta) for details. If you have already converted them to FASTA, you can analyze FASTA files by skipping a few steps.
+This pipeline assumes high-quality, pre-processed FASTQ files from long-read sequencing are provided - see [step 1](#1-data-preprocessing---from-fastq-to-fasta) for details. If you have already converted them to FASTA, you can analyze FASTA files by skipping a few steps.
 
 ## Tools
 
@@ -91,8 +91,6 @@ While this repository is released under the MIT License, a part of the analysis 
 If you use this code, scripts, or data in your research, we’d love to hear from you! Please also cite this work. Once the manuscript is out, we will provide a DOI. For now, you can cite it as:  
 
 > M. Kocikowski, *covid-scfv-publication* (GitHub repository), 2026. Available at: https://github.com/MikolajKocikowski/covid-scfv-publication
-
-We welcome feedback, suggestions, or contributions - feel free to open an issue or pull request!
 
 # Analysis
 
@@ -243,7 +241,11 @@ mv *correspondence* *seguid* /analysis/2.Catalogued/
 
 ### 3. V(D)J alignment
 
-**Important:** this is the longest and most resource-hungry part. `vscan_functions.py` runs several analysis iterations, first one being the longest, and taking approximately 1-2 CPU-hours / 1GB of starting data (FASTQ). Hence **ADJUST THE THREADS** based on availability, in the `ig_threads` parameter. If unsure, leave some CPUs free to avoid crashing the system. Too many threads compared to available RAM might also cause an Out Of Memory (OOM) killing of the process - reduce threads. **HOWEVER the RAM use peaks** at the end of the first iteration (which might a few hours into the runtime), when Pandas has to read in the entire output. This easily causes an OOM error with big datasets. As a rule of thumb, aim to have RAM available 2x the size of starting data. In my experience, starting with 115 GB of FASTAs, 96GB RAM was not enough, but 250GB RAM was enough to complete the analysis. 
+**Important:** this is the longest and most resource-hungry part. 
+
+`vscan_functions.py` runs several analysis iterations, first one being the longest, and taking approximately 1-2 CPU-hours / 1GB of starting data (FASTQ). Hence adjust the threads in the `ig_threads` parameter based on availability. If unsure, leave some CPUs free to avoid crashing the system. Too many threads compared to available RAM might also cause an Out Of Memory (OOM) killing of the process - reduce threads. 
+
+**HOWEVER the RAM use peaks** at the end of the first iteration (which might a few hours into the runtime), when Pandas reads in the entire output. This easily causes an OOM crash with big datasets. As a rule of thumb, aim to have RAM available 2x the size of starting data. In my experience, starting with 115 GB of FASTQs, 96GB RAM was not enough, but 250GB RAM was enough to complete the analysis. 
 
 ```bash
 # user input
@@ -276,7 +278,7 @@ vscan_functions.py --query $fasta \
 mkdir /analysis/3.vscan
 mv igBLAST.tsv /analysis/3.vscan/
 
-rm ddDNA*tsv ddDNA*fasta # optional
+rm ddDNA*tsv ddDNA*fasta # optional cleanup
 
 ```
 
@@ -324,7 +326,7 @@ linker_scorer.py --scFv $scfvs --linker aa_reference_linker.fasta
 
 #### Linker overview - inspect visually
 
-The toolkit provides - at both aa and nt level: a sequence logo of consensus linker (`*_linkers_logo.pdf`), linker length distribution table (`*_inferred_linkers_length.tsv`) + a histogram (`*_inferred_linkers_length.png`), and a table with the 10 most frequently observed linker sequences (`*_top10_linkers.tsv`). The linker information is used to flag the quality of the scFv hits (but no automatic filtering), and can be used to infer the quality of the library, sequencing, and gene annotation.
+The script produces - at both aa and nt level: a sequence logo of consensus linker (`*_linkers_logo.pdf`), a linker length distribution table (`*_inferred_linkers_length.tsv`) + a histogram (`*_inferred_linkers_length.png`), and a table with the 10 most frequently observed linker sequences (`*_top10_linkers.tsv`). The linker information is used to flag the quality of the scFv hits (but no automatic filtering), and can be used to infer the quality of the library, sequencing, and gene annotation.
 
 ```bash
 # get linker lengths
@@ -375,7 +377,7 @@ mv in_frame_igBLAST_paired_delim_linker_scored_flags_counts.tsv /analysis/7.Coun
 
 If you inspect the output and for a given scFv there are 0 counts across all samples, it means there is a mismatch between sample names in `focus_libs.txt` and the other input files. This is unlikely with the current automated generation of `focus_libs.txt`.
 
-### 8. Post-processing
+## Post-processing
 
 Download the key output file (or all) and process it in R. 
 
