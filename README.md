@@ -27,6 +27,7 @@
       - [Linker overview](#linker-overview---inspect-visually)
     - [6. scFv flags](#6-scfv-flags)
     - [7. Per-library read counts](#7-recovering-per-library-read-counts)
+    - [8. Generate an attrition table](#generate-an-attrition-table)
   - [Post-processing](#post-processing)
 
 
@@ -375,7 +376,80 @@ mkdir /analysis/7.Counts
 mv in_frame_igBLAST_paired_delim_linker_scored_flags_counts.tsv /analysis/7.Counts/
 ```
 
-If you inspect the output and for a given scFv there are 0 counts across all samples, it means there is a mismatch between sample names in `focus_libs.txt` and the other input files. This is unlikely with the current automated generation of `focus_libs.txt`.
+If you inspect the output and for a given scFv there are 0 counts across all samples, it means there is a mismatch between sample names in `focus_libs.txt` and the other input files. This is however unlikely with the current automated generation of `focus_libs.txt`.
+
+### 8. Generate an attrition table
+
+The resultant table summarizes sequence counts at each major step of the pipeline, showing attrition from raw reads to fully validated scFvs.
+
+Create a script by running `nano attrition_table.sh`.
+Paste the code below.
+Deploy: `bash attrition_table.sh > attrition_table.tsv`
+
+```bash
+#!/bin/bash
+
+# Explicit order
+labels=(
+  "Merged libraries"
+  "De-duplicated reads"
+  "Ig domains"
+  "Non-paired / multi VH/VL"
+  "Out-of-frame scFvs"
+  "Non-standard AAs"
+  "Validated scFvs"
+)
+
+declare -A files=(
+  ["Merged libraries"]="analysis_folder/2.Catalogued/merged.nt_correspondence.tsv"
+  ["De-duplicated reads"]="analysis_folder/2.Catalogued/merged.nt_seguid.fa"
+  ["Ig domains"]="analysis_folder/3.vscan/igBLAST.tsv"
+  ["Validated scFvs"]="analysis_folder/4.scFv_split/in_frame_igBLAST_paired_delim.tsv"
+  ["Non-standard AAs"]="analysis_folder/4.scFv_split/in_frame_igBLAST_delim_nonstandard_aas.tsv"
+  ["Out-of-frame scFvs"]="analysis_folder/4.scFv_split/out_of_frame_igBLAST_paired_delim.tsv"
+  ["Non-paired / multi VH/VL"]="analysis_folder/4.scFv_split/igBLAST_non_paired_nondelim.tsv"
+)
+
+# Print header
+echo -e "Category\tCount"
+
+# Loop over labels in desired order
+for label in "${labels[@]}"; do
+    file="${files[$label]}"
+    if [[ "$file" == *.tsv ]]; then
+        count=$(($(wc -l < "$file") - 1))
+    elif [[ "$file" == *.fa ]]; then
+        count=$(grep -c '^>' "$file")
+    else
+        count="N/A"
+    fi
+    echo -e "${label}\t${count}"
+done
+```
+
+Print it nicely formated:
+```bash
+cat attrition_table.tsv | column -t -s $'\t'
+```
+
+Example output
+```
+Category                  Count
+Merged libraries          1629771
+De-duplicated reads       1629731
+Ig domains                539480
+Non-paired / multi VH/VL  372322
+Out-of-frame scFvs        79938
+Non-standard AAs          0
+Validated scFvs           3641
+```
+
+The following categories are discarded: 
+- `Non-paired / multi VH/VL` -- unpaired sequences, or sequences with more than 1 VH or VL
+- `Out-of-frame scFvs` -- sequences with stop codons in the scFv, or incongruent frames between VH and VL
+- `Non-standard AAs` -- paired VH-VL sequences presenting non-standard aminoacids
+
+The final output file contains additional quality scores based on flagging settings from steps 5-6, but these are not used to filter any sequence out, only made available to the user.
 
 ## Post-processing
 
