@@ -47,7 +47,7 @@ What will be progressively added:
 
 ## Requirements
 
-The analysis can be very RAM-intensive - see [step 3](#3-vdj-alignment) to estimate your requirements! If the input dataset is large (more than a few samples), using an HPC or a powerful remote VM is recommended. 
+The analysis can be very RAM-intensive - see [step 3](#3-vdj-alignment) and [step 4](#4-scfv-delimitation-and-characterization)to estimate your requirements. For processing more than a few samples, an HPC or a powerful VM is recommended. As a guesstimate, aim to have 2-3x more RAM than GBs of raw data.
 
 Docker is required, but it is not allowed on some HPC systems due to security restrictions. In theory a `Docker image` can be converted for use with `Apptainer` - if you can make it work, I'd love to talk.
 
@@ -131,17 +131,15 @@ rclone config
 # test connection: list directories on remote
 rclone lsd stage:data-stage
 
-# copy raw data; checkers stage data and are lighter than transfers
-rclone copy stage:data-stage/data/ ~/analysis_folder/ --progress --verbose --transfers 8 --checkers 16
-
-# check the transfer: compares sizes and hashes in the source and destination, reports mismatches
-rclone check stage:data-stage/data/ ~/analysis_folder/
-
-# copy the FASTQ files for analysis; if you have FASTA, you will just skip some steps later
-mv analysis_folder/*.fastq analysis_folder/raw_data/
+# copy raw data; FASTA is acceptable too - you will skip some steps later; checkers stage data and are lighter
+rclone copy stage:data-stage/data ~/analysis_folder/raw_data \
+  --include "*.fastq" \
+  --progress \
+  --transfers 8 \
+  --checkers 16
 ```
 
-### Copy in the IgBlast reference files
+### Copy-in the IgBlast reference files
 
 ```bash
 # clone the GitHub repo with IgBlast custom reference files - or generate them yourself
@@ -286,6 +284,8 @@ rm ddDNA*tsv ddDNA*fasta # optional cleanup
 If `ddDNA_igblast_1.tsv` is empty or wasn't created in the output, sth went catastrophically wrong. If `igBLAST.tsv` is missing, you probably had an OOM process kill due to insufficient RAM, investigate kernel messages with `journalctl -k | tail -50` or `dmesg | grep -i kill`. If `ddDNA_splitfasta_1.fasta` is empty and `igBLAST.tsv` only contains a header, you probably misplaced or misformated the IgBlast reference files.
 
 ### 4. scFv delimitation and characterization
+
+This process can have sudden **peaks of RAM usage**, depending on the CPU and moon phase. In my experience, starting with 115 GB of FASTQs, 250GB RAM was not enough at those peaks, but changing to a machine with 380 GB RAM and better CPUs, the peak RAM utilization did not exceed ~50%... Plan accordingly.
 
 FYI: `scFv_splitter.py` uses `AntPack`, and AntPack ≥0.3.9 requires a license key. Hence, I pinned `antpack==0.3.8.5` in the current toolkit's Docker image (1.1) for a reproducible and democratic pipeline. Also, expect syntax warnings from this step.
 
@@ -438,7 +438,10 @@ for label in "${labels[@]}"; do
     echo -e "${label}\t${count}"
 done
 ```
-Example output
+The `-1` in `count=$(($(wc -l < "$file") - 1))` ensures we don't count the header line in case of `*.tsv` files which hold one result per row (plus a header row).
+
+**Example output:**
+
 ```
 Category                  Count
 Merged libraries          1629771
@@ -459,10 +462,16 @@ The final output file contains additional quality scores based on flagging setti
 
 ## Post-processing
 
-Download the key output file (or all) and process it in R. 
+Download (or copy) the key output files - at the minimum these 3:
 
 ```bash
 # example download from server - run from the personal computer: 
 scp root@123.456.78.901:/root/analysis_folder/7.Counts/in_frame_igBLAST_paired_delim_linker_scored_flags_counts.tsv ~/Downloads/
 
+scp root@123.456.78.901:/root/analysis_folder/focus_libs.txt ~/Downloads/
+
+scp root@123.456.78.901:/root/attrition_table.tsv ~/Downloads/
+
 ```
+
+...and continue the analysis in R. 
