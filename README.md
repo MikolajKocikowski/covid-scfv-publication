@@ -47,7 +47,7 @@ What will be progressively added:
 
 ## Requirements
 
-The analysis can be very RAM-intensive - see [step 3](#3-vdj-alignment) and [step 4](#4-scfv-delimitation-and-characterization)to estimate your requirements. For processing more than a few samples, an HPC or a powerful VM is recommended. As a guesstimate, aim to have 2-3x more RAM than GBs of raw data.
+The analysis can be very RAM-intensive - see [step 3](#3-vdj-alignment) and [step 4](#4-scfv-delimitation-and-characterization) to estimate your requirements. For processing more than a few samples, an HPC or a powerful VM is recommended. As a guesstimate, aim to have 2-3x more RAM than GBs of raw data.
 
 Docker is required, but it is not allowed on some HPC systems due to security restrictions. In theory a `Docker image` can be converted for use with `Apptainer` - if you can make it work, I'd love to talk.
 
@@ -149,14 +149,28 @@ git clone https://github.com/MikolajKocikowski/covid-scfv-publication.git
 cp -r covid-scfv-publication/for_igblast analysis_folder/
 ```
 
-### Download the docker image (private - you need to be logged AND authorized on DockerHub)
+### Download the docker image (currently set to private - you'll need to be logged-in AND authorized)
+
+Option A: GHCR
+
+```bash
+
+# authenticate with a Private Access Token previously generated on GitHub
+echo Your_PAT | docker login ghcr.io -u Your_Username --password-stdin
+
+# pull the image
+docker pull ghcr.io/mikolajkocikowski/seq2scfv-unofficial-updated:1.2
+
+```
+
+Option B: DockerHub
 
 ```bash
 # authenticate to the DockerHub
 docker login
 
 # pull the image
-docker pull skogsv/seq2scfv-unofficial-updated:1.1
+docker pull skogsv/seq2scfv-unofficial-updated:1.2
 ```
 
 ### Run a docker container
@@ -166,7 +180,7 @@ Create a container from the docker image, with read/write access to the analysis
 ```bash
 docker run -it --name seq2scfv_container \
   -v ~/analysis_folder:/analysis:rw \
-  skogsv/seq2scfv-unofficial-updated:1.1 \
+  skogsv/seq2scfv-unofficial-updated:1.2 \
   bash
 ```
 
@@ -287,7 +301,7 @@ If `ddDNA_igblast_1.tsv` is empty or wasn't created in the output, sth went cata
 
 This process can have sudden **peaks of RAM usage**, depending on the CPU and moon phase. In my experience, starting with 115 GB of FASTQs, 250GB RAM was not enough at those peaks, but changing to a machine with 380 GB RAM and better CPUs, the peak RAM utilization did not exceed ~50%... Plan accordingly.
 
-FYI: `scFv_splitter.py` uses `AntPack`, and AntPack ≥0.3.9 requires a license key. Hence, I pinned `antpack==0.3.8.5` in the current toolkit's Docker image (1.1) for a reproducible and democratic pipeline. Also, expect syntax warnings from this step.
+FYI: `scFv_splitter.py` uses `AntPack`, and AntPack ≥0.3.9 requires a license key. Hence, I pinned `antpack==0.3.8.5` in the current toolkit's Docker image for a reproducible and democratic pipeline. Also, expect syntax warnings from this step.
 
 ```bash
 # user input
