@@ -151,7 +151,7 @@ cp -r covid-scfv-publication/for_igblast analysis_folder/
 
 ### Download the docker image (currently set to private - you'll need to be logged-in AND authorized)
 
-Option A: GHCR
+Recommended: GitHub Container Registry (GHCR)
 
 ```bash
 
@@ -163,7 +163,7 @@ docker pull ghcr.io/mikolajkocikowski/seq2scfv-unofficial-updated:1.2
 
 ```
 
-Option B: DockerHub
+Deprecated: DockerHub
 
 ```bash
 # authenticate to the DockerHub
@@ -176,11 +176,12 @@ docker pull skogsv/seq2scfv-unofficial-updated:1.2
 ### Run a docker container
 
 Create a container from the docker image, with read/write access to the analysis files.
+Update the image name to match your source.
 
 ```bash
 docker run -it --name seq2scfv_container \
   -v ~/analysis_folder:/analysis:rw \
-  skogsv/seq2scfv-unofficial-updated:1.2 \
+  ghcr.io/mikolajkocikowski/seq2scfv-unofficial-updated:1.2 \
   bash
 ```
 
