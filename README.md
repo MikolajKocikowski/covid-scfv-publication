@@ -29,6 +29,9 @@
     - [7. Per-library read counts](#7-recovering-per-library-read-counts)
     - [8. Generate an attrition table](#8-generate-an-attrition-table)
   - [Post-processing](#post-processing)
+    - [Download the output files](#download-the-output-files)
+    - [Copy the key output](#copy-the-key-output)
+    - [Use renv for R Environment Reproducibility](#use-renv-for-r-environment-reproducibility)
 
 
 ## Purpose
@@ -477,7 +480,9 @@ The final output file contains additional quality scores based on flagging setti
 
 ## Post-processing
 
-Download the output files - example (from server to PC):
+### Download the output files 
+
+Example (from server to PC):
 
 ```bash
 
@@ -486,6 +491,8 @@ scp root@123.456.78.901:/root/analysis_folder/focus_libs.txt ~/Downloads/
 scp root@123.456.78.901:/root/attrition_table.tsv ~/Downloads/
 
 ```
+
+### Copy the key output
 
 Copy at minimum these 3 to the input folder for the R analysis:
 
@@ -498,3 +505,16 @@ cp in_frame_igBLAST_paired_delim_linker_scored_flags_counts.tsv \
 
 ```
 ...and continue the analysis in R. 
+
+### Use renv for R Environment Reproducibility
+
+This project uses renv to ensure a reproducible R environment and avoid dependency hell. When you clone the repo, restore the package environment before running the analysis in the `.Rmd` file:
+
+1. Open the project by double-clicking the `.Rproj file` - this will automatically activate renv. 
+2. In the R console, run:
+
+```r
+renv::restore()
+```
+
+This will install all required packages at the correct versions as recorded in `renv.lock`. You only need to do this once per machine.
