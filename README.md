@@ -477,16 +477,24 @@ The final output file contains additional quality scores based on flagging setti
 
 ## Post-processing
 
-Download (or copy) the key output files - at the minimum these 3:
+Download the output files - example (from server to PC):
 
 ```bash
-# example download from server - run from the personal computer: 
+
 scp root@123.456.78.901:/root/analysis_folder/7.Counts/in_frame_igBLAST_paired_delim_linker_scored_flags_counts.tsv ~/Downloads/
-
 scp root@123.456.78.901:/root/analysis_folder/focus_libs.txt ~/Downloads/
-
 scp root@123.456.78.901:/root/attrition_table.tsv ~/Downloads/
 
 ```
 
+Copy at minimum these 3 to the input folder for the R analysis:
+
+```bash
+
+cp in_frame_igBLAST_paired_delim_linker_scored_flags_counts.tsv \
+   focus_libs.txt \
+   attrition_table.tsv \
+   R/scfv_extraction_output/
+
+```
 ...and continue the analysis in R. 
