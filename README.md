@@ -508,7 +508,7 @@ cp in_frame_igBLAST_paired_delim_linker_scored_flags_counts.tsv \
 
 ### Use renv for R Environment Reproducibility
 
-This project uses renv to ensure a reproducible R environment and avoid dependency hell. When you clone the repo, restore the package environment before running the analysis in the `.Rmd` file:
+This project uses [renv](https://rstudio.github.io/renv/) to ensure a reproducible R environment and avoid dependency hell. When you clone the repo, restore the package environment before running the analysis in the `.Rmd` file:
 
 1. Open the project by double-clicking the `.Rproj file` - this will automatically activate renv. 
 2. In the R console, run:
