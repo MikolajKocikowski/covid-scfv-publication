@@ -41,12 +41,14 @@ This repository contains instructions for reproducing the work from an upcoming 
 ## Scope
 
 The repository currently contains:
-- code and instructions for scFv extraction
-- custom species reference files for IgBlast ([description in progress]())
+- code and instructions for scFv extraction pipeline
+- custom species reference files for IgBlast
+- data analysis in `R` 
 
 What will be progressively added:
-- extensive data analysis in `R` 
-- pipeline automation with Snakemake/Nextflow
+- code chunks for additional analyses
+- modularized R code
+- pipeline automation
 
 ## Requirements
 
