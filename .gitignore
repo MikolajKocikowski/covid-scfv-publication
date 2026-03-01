@@ -1,2 +1,20 @@
+# Data files
+*.rds
+*.csv
+*.tsv
+*.xlsx
+
+# Keep input data folder placeholder without data
 scfv_extraction_output/*
 !scfv_extraction_output/.gitkeep
+
+# Folders with results and temp files
+r_output/
+scfv_extraction_output/
+versions/
+TRASH/
+
+# RStudio files
+.Rproj.user/
+.Rhistory
+.RData

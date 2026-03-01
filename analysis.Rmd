@@ -1506,5 +1506,242 @@ for (s in samples) {
   plot_chord(filt_df, s) # display the plot; circlize does not return plots like normal ggplot to allow p <- function etc.
 }
 
+```
+
+
+```{r clustering-global}
+
+# Here we define clusters based on the entire UMAP scfv space, for reuse in downstream analyses
+
+# Options that I considered: 
+# clustering on original k-mer embedding before UMAP: more accurate, but slower
+# clustering on UMAP data - faster, used here
+# k-means clustering: fast, but assumes spherical clusters and requires pre-defining cluster numbers
+# dbscan: clusters can be irregular, automatically identifies them based on density, you need to define eps - how close points need to be to form a cluster
+# hdbscan: like dbscan, but atomatically picks the best eps; however, very memory hungry, easily crashes Rstudio
+
+library(dbscan)
+library(ggforce)
+
+# ensure dir exists
+dir.create("r_output/clusters", showWarnings = FALSE, recursive = TRUE)
+
+# Load UMAP data
+plot_df_umap <- read.csv("r_output/tables/plot_df_umap.csv")
+
+# Prepare UMAP coordinates for clustering
+umap_coords <- plot_df_umap %>% 
+  select(UMAP1, UMAP2) %>% 
+  distinct() %>%
+  as.matrix()
+
+# Run DBSCAN clustering; adjust eps; 'hdbscan' does it automatically, but is very memory hungry!
+clusters <- dbscan(umap_coords, eps = 1, minPts = 10)
+
+# Check how many clusters we got
+table(clusters$cluster)
+
+# Add cluster assignment back to data
+umap_with_clusters <- plot_df_umap %>%
+  select(UMAP1, UMAP2) %>%
+  distinct() %>%
+  mutate(cluster = as.factor(clusters$cluster))
+
+plot_df_umap <- plot_df_umap %>%
+  left_join(umap_with_clusters, by = c("UMAP1", "UMAP2"))
+
+# Calculate cluster centers as locations for labels, so we can identify them; skipping cluster 0 (noise)
+# geom_mark_hull natively has an option to label clusters, but it is not suitable to a dense space with many of them (only can display a few)
+
+cluster_centers <- plot_df_umap %>%
+  filter(cluster != 0) %>%
+  group_by(cluster) %>%
+  summarize(
+    center_x = mean(UMAP1),
+    center_y = mean(UMAP2)
+  )
+
+
+# plotting
+p <- ggplot(plot_df_umap, aes(UMAP1, UMAP2)) +
+  stat_density_2d(
+    aes(fill = after_stat(ndensity)),
+    geom = "raster",
+    contour = FALSE,
+    n = 200
+  ) +
+  scale_fill_viridis_c(option = "magma") +
+  
+  # cluster boundaries
+  geom_mark_hull(
+    data = plot_df_umap %>% filter(cluster != 0),
+    aes(group = cluster),  # Changed from fill to just group
+    color = "cyan",
+    fill = NA,  # No fill, just boundaries
+    linewidth = 0.3,
+    concavity = 2,
+    expand = 0.01,
+    radius = 0.01
+  ) +
+  
+  # cluster labels
+  geom_text(
+    data = cluster_centers,
+    aes(x = center_x, y = center_y, label = cluster),
+    size = 1.5,
+    fontface = "bold",
+    color = "cyan"
+  ) +
+  
+  coord_equal() +
+  theme_classic() +
+  theme(legend.position = "none")
+
+ggsave("r_output/clusters/global_clusters.png", p, width = 10, height = 8)
+
+print(p)
+```
+
+```{r clustering-sample-ovelay}
+
+# Generating a plot of hotspots for each sample with the globally-defined clusters (from above) overlaid
+
+# ensure dir exists
+dir.create("r_output/clusters/samples_vs_clusters", showWarnings = FALSE, recursive = TRUE)
+
+# Get all unique samples
+all_samples <- unique(plot_df_umap$sample)
+
+# Loop through each sample
+for (s in all_samples) {
+  p <- ggplot(plot_df_umap, aes(UMAP1, UMAP2)) +
+    # Density raster for THIS sample only
+    stat_density_2d(
+      data = plot_df_umap %>% filter(sample == s),
+      aes(fill = after_stat(ndensity)),
+      geom = "raster",
+      contour = FALSE,
+      n = 200
+    ) +
+    scale_fill_viridis_c(option = "magma") +
+    
+    # Same cluster boundaries for ALL samples
+    geom_mark_hull(
+      data = plot_df_umap %>% filter(cluster != 0),
+      aes(group = cluster),
+      color = "cyan",
+      fill = NA,
+      linewidth = 0.3,
+      concavity = 2,
+      expand = 0.01,
+      radius = 0.01
+    ) +
+    
+    # Same cluster labels for ALL samples
+    geom_text(
+      data = cluster_centers,
+      aes(x = center_x, y = center_y, label = cluster),
+      size = 1.5,
+      fontface = "bold",
+      color = "cyan"
+    ) +
+    
+    coord_equal() +
+    theme_classic() +
+    theme(legend.position = "none") +
+    ggtitle(paste("Sample:", s))
+  
+  ggsave(paste0("r_output/clusters/samples_vs_clusters/sample_", s, ".png"), 
+         p, width = 10, height = 8, dpi = 300)
+}
 
 ```
+
+
+```{r pull-sequences-from-cluster}
+
+# Example dissection of a cluster for more info
+
+# There is an option to extract only seq belonging to a defined cluster + sample
+# For this add it to filter like: `filter(cluster == 12, sample == "BA5_R4")`
+
+# extract all sequences in cluster 12
+cluster_12_sequences <- plot_df_umap %>%
+  filter(cluster == 12) %>%
+  pull(scfv_seq) %>%
+  unique()
+
+# see how many unique sequences we got
+length(cluster_12_sequences)
+
+# Check length distribution
+table(nchar(cluster_12_sequences))
+
+# see which samples they come from
+cluster_12_summary <- plot_df_umap %>%
+  filter(cluster == 12) %>%
+  group_by(sample) %>%
+  summarize(n_sequences = n_distinct(scfv_seq)) %>%
+  arrange(desc(n_sequences))
+
+print(cluster_12_summary)
+
+# save the sequences to a file
+write.csv(
+  data.frame(scfv_seq = cluster_12_sequences),
+  "r_output/clusters/cluster_12_sequences.csv",
+  row.names = FALSE
+)
+
+# Save the sequences as FASTA
+writeLines(
+  paste0(">cluster_12_seq_", 1:length(cluster_12_sequences), "\n", 
+         cluster_12_sequences),
+  "r_output/clusters/cluster_12_sequences.fasta"
+)
+```
+
+
+```{r pheatmap-clusters-samples}
+
+# A heatmap showing which samples are represented strongly in which clusters
+
+library(pheatmap)
+
+dir.create("r_output/clusters", showWarnings = FALSE, recursive = TRUE)
+
+# Create matrix: samples x clusters
+cluster_matrix <- plot_df_umap %>%
+  filter(cluster != 0) %>%
+  count(sample, cluster) %>%
+  pivot_wider(names_from = cluster, values_from = n, values_fill = 0)
+
+mat <- as.matrix(cluster_matrix[,-1])
+rownames(mat) <- cluster_matrix$sample
+
+# Normalize by sample (proportion)
+mat_norm <- mat / rowSums(mat)
+
+# Filter out low-representation clusters - keep only those where at least one sample has >1% representation; can get more stringent
+cluster_keep <- colSums(mat_norm > 0.01) > 0
+mat_filtered <- mat_norm[, cluster_keep]
+
+# Log transform (add small value to avoid log(0), but the usual 1 is too large here as the values are small)
+mat_log <- log10(mat_filtered + 0.001)
+
+# Plot LOG version of plot
+pheatmap(
+  mat_log,
+  scale = "none",
+  cluster_rows = FALSE,
+  cluster_cols = TRUE,
+  color = colorRampPalette(c("white", "red"))(100),
+  main = "Sample vs Cluster (log10 scale, filtered)",
+  filename = "r_output/clusters/cluster_heatmap_log.png",
+  width = 14,
+  height = 10
+)
+
+```
+
+
