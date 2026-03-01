@@ -56,7 +56,7 @@ The analysis can be very RAM-intensive - see [step 3](#3-vdj-alignment) and [ste
 
 Docker is required, but it is not allowed on some HPC systems due to security restrictions. In theory a `Docker image` can be converted for use with `Apptainer` - if you can make it work, I'd love to talk.
 
-This pipeline assumes high-quality, pre-processed FASTQ files from long-read sequencing are provided - see [step 1](#1-data-preprocessing---from-fastq-to-fasta) for details. If you have already converted them to FASTA, you can analyze FASTA files by skipping a few steps.
+This pipeline assumes high-quality, pre-processed FASTQ files from long-read sequencing are provided - see [step 1](#1-data-preprocessing---from-fastq-to-fasta) for details. If you have already converted them to FASTA, you can analyze FASTA files by skipping a few steps. The file names will by default be used as sample names downstream, so it is recommended to make them meaningful upfront.
 
 ## Tools
 
