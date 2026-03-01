@@ -496,7 +496,7 @@ scp root@123.456.78.901:/root/attrition_table.tsv ~/Downloads/
 
 ### Copy the key output
 
-Copy at minimum these 3 to the input folder for the R analysis:
+Copy at minimum the 3 files below to the input folder for the R analysis: `scfv_extraction_output`.
 
 ```bash
 
