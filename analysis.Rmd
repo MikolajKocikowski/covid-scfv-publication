@@ -25,12 +25,14 @@ library(tibble)
 library(uwot)
 library(svglite)
 library(readr)
+library(dbscan)
+library(ggforce)
 
 
 # Sample names to be analyzed (one per line in file) - must match colnames in df
 sample_cols <- readLines("scfv_extraction_output/focus_libs.txt")
 
-# MAnual reordering to have naive library controls moved to the front
+# Manual reordering to have naive library controls moved to the front
 priority <- c("OG_LIB", "NEW_LIB")
 sample_cols <- c(priority, setdiff(sample_cols, priority))
 
@@ -60,6 +62,12 @@ for (d in OUTPUT_DIRS) {
   }
 }
 
+# USING RENV
+
+# Recording env in renv
+# Record: renv::snapshot()
+# Check consistency: renv::status()
+# Remove a package: renv::remove("package_name")
 
 ```
 
@@ -786,12 +794,12 @@ for (ref in sample_cols) {
 # TEMPORARY: cleaning the environment to free up RAM, until I modularize
 
 # Save an object to a file
-saveRDS(filt_df, file = "filt_df.rds")
+saveRDS(filt_df, file = "data/filt_df.rds")
 
 # MAnually RM, clean env
 
 # Restore the object
-filt_df <- readRDS(file = "filt_df.rds")
+filt_df <- readRDS(file = "data/filt_df.rds")
 ```
 
 
@@ -850,7 +858,7 @@ emb <- t(sapply(unique_seqs, function(s) {
 }))
 
 # save object - takes a long compute to get it!
-saveRDS(emb, file = "emb_embedding.rds")
+saveRDS(emb, file = "data/emb_embedding.rds")
 
 # UMAP embedding
 
@@ -859,14 +867,14 @@ n_neighbors <- min(15, nrow(emb) - 1)
 um <- umap(emb, n_neighbors = n_neighbors, metric = "cosine")
 
 # save object - takes a long compute to get it!
-saveRDS(um, file = "um_umap.rds")
+saveRDS(um, file = "data/um_umap.rds")
 
 ```
 
 ```{r preapare-umap-df}
 
 # if needed
-um <- readRDS(file = "um_umap.rds")
+um <- readRDS(file = "data/um_umap.rds")
 
 df_umap <- data.frame(scfv_seq = unique_seqs,
                       UMAP1 = um[, 1],
@@ -878,8 +886,8 @@ plot_df_umap <- scfv_long %>%
   left_join(df_umap, by = "scfv_seq")
 
 # save the DF - it is computationally heavy to produce
-  
-write.csv(plot_df_umap, "r_output/tables/plot_df_umap.csv", row.names = FALSE)
+# deprecated: write.csv(plot_df_umap, "r_output/tables/plot_df_umap.csv", row.names = FALSE)
+saveRDS(plot_df_umap, file = "data/plot_df_umap.rds")
   
 ```
 
@@ -1520,14 +1528,12 @@ for (s in samples) {
 # dbscan: clusters can be irregular, automatically identifies them based on density, you need to define eps - how close points need to be to form a cluster
 # hdbscan: like dbscan, but atomatically picks the best eps; however, very memory hungry, easily crashes Rstudio
 
-library(dbscan)
-library(ggforce)
-
 # ensure dir exists
 dir.create("r_output/clusters", showWarnings = FALSE, recursive = TRUE)
 
 # Load UMAP data
-plot_df_umap <- read.csv("r_output/tables/plot_df_umap.csv")
+# deprecated: plot_df_umap <- read.csv("r_output/tables/plot_df_umap.csv")
+plot_df_umap <- readRDS(file = "data/plot_df_umap.rds")
 
 # Prepare UMAP coordinates for clustering
 umap_coords <- plot_df_umap %>% 
@@ -1601,6 +1607,7 @@ ggsave("r_output/clusters/global_clusters.png", p, width = 10, height = 8)
 
 print(p)
 ```
+
 
 ```{r clustering-sample-ovelay}
 
@@ -1705,8 +1712,6 @@ writeLines(
 ```{r pheatmap-clusters-samples}
 
 # A heatmap showing which samples are represented strongly in which clusters
-
-library(pheatmap)
 
 dir.create("r_output/clusters", showWarnings = FALSE, recursive = TRUE)
 

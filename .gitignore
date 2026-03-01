@@ -13,6 +13,7 @@ r_output/
 scfv_extraction_output/
 versions/
 TRASH/
+data/
 
 # RStudio files
 .Rproj.user/
